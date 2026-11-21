@@ -25,7 +25,7 @@ Use these example rows or copy the same pattern onto other free rows. For shared
 | SSD1306 I2C OLED | `VCC` to left `+`, `GND` to left `-` | `SDA` and GPIO21 to **L6**. `SCL` and GPIO22 to **L7**. Some boards mark the I2C clock `SCK`. |
 | DS3231 clock (planned) | Board supply to left `+` if rated for 3.3 V, `GND` to left `-` | `SDA` to **L6** and `SCL` to **L7**. The clock and screen share the same two wires. |
 | 3.3 V SPI microSD board | `3V` or documented 3.3 V supply to left `+`, `GND` to left `-` | `CLK/SCK` with GPIO18 at **L8**, `SO/MISO` with GPIO19 at **L9**, `SI/MOSI` with GPIO23 at **L10**, and `CS` with GPIO13 at **L11**. |
-| DS18B20 probe | Verified `VDD` to left `+`, `GND` to left `-` | `DQ` and GPIO4 to **L12**. Add a **4.7 kΩ** resistor from another hole in L12 to left `+`. Check probe wire roles on its own label or manual. |
+| DS18B20 probe and adapter | Adapter `VCC` to left `+` (3.3 V), `GND` to left `-` | Adapter `DAT` and GPIO4 to **L12**. Use the adapter's built-in **4.7 kΩ** pull-up if fitted. Otherwise add it from **L12** to left `+`. [Probe colors and adapter checks](SOLAR_TO_READING_GUIDE.md#ds18b20-probe-and-terminal-adapter) |
 | DFRobot SEN0161 pH kit | Board `+` to right `+`, board `-` to right `-` | Probe plugs into the board's **BNC** socket. Board pin `A` goes to **L15** and passes through the pH divider below to GPIO34. |
 | DFRobot SEN0308 moisture probe | `VCC` to left `+`. Connect both documented `GND` leads to ground. | `Signal` goes to **R15** and passes through the moisture divider below to GPIO35. DFRobot marks red as VCC, yellow as Signal, and both black leads as GND. |
 | Scan button | One switched contact to GND | Other switched contact to GPIO32. Example group for the GPIO wire is **L25**. |
@@ -66,7 +66,7 @@ Put each capacitor's other leg on GND. Before connecting GPIO34 or GPIO35, power
    | Signal wire | Direct connection |
    | --- | --- |
    | Card `CLK/SCK`, `SO/MISO`, `SI/MOSI`, `CS` | GPIO18, GPIO19, GPIO23, GPIO13 respectively |
-   | DS18B20 `DQ` | GPIO4, with 4.7 kΩ from GPIO4 to 3.3 V |
+   | DS18B20 adapter `DAT` | **D4** (GPIO4). Adapter `VCC → 3V3` and `GND → GND`. Add **4.7 kΩ** from GPIO4 to 3.3 V only if the adapter has no pull-up. [Probe colors and adapter checks](SOLAR_TO_READING_GUIDE.md#ds18b20-probe-and-terminal-adapter) |
    | pH `A` | Through the 12 kΩ/10 kΩ divider to GPIO34 |
    | Moisture `Signal` | Through the 10 kΩ/20 kΩ divider to GPIO35 |
    | Scan, View | GPIO32 to GND through Scan. GPIO33 to GND through View. |

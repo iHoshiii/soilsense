@@ -12,7 +12,7 @@ Use this list with the diagram. The LAFVIN kit already lists the ESP32 board, a 
 | --- | --- |
 | ESP32 bench setup | 1 classic ESP32 DevKit, 1 USB data cable, 1 breadboard, and jumper wires that fit the headers you have. |
 | Moisture and pH | 1 SEN0308, 1 SEN0161 interface board and its BNC probe, **four 10 kΩ resistors, one 1 kΩ resistor, and two 100 nF ceramic capacitors**. Use a verified regulated 5 V supply for the SEN0161. |
-| Soil temperature | 1 waterproof DS18B20 probe and **one 4.7 kΩ pull-up resistor**. Check the actual probe wire labels. |
+| Soil temperature | 1 waterproof DS18B20 probe, its `DAT` / `VCC` / `GND` terminal adapter, and three jumper wires. Have a **4.7 kΩ** resistor if your adapter has no built-in pull-up. |
 | Display and controls | 1 four-pin 128×64 I2C SSD1306 and 2 normally open momentary buttons for Scan and View. |
 | Storage and time | 1 compatible 3.3 V SPI microSD breakout and 1 FAT32 microSD card. Add 1 DS3231 and its board-specific backup cell for offline timestamps. Have a PC card reader if needed. |
 | Solar and battery | 1 DFR0559, the panel, 1 compatible 3.7 V rechargeable cell or pack, and an insulated matching holder or connector. Check the panel's raw DC output and the cell rating. Use the cooling pad and fin specified for the DFR0559 with the listed 10 W panel. |
@@ -74,8 +74,8 @@ Plug the probe into the round BNC socket. **Red (`+`) → regulated 5 V. Black (
 
 ```text
 Blue A ── 10 kΩ ── 1 kΩ ──●── 10 kΩ ── GND
-                           ├──────────── D34
-                           └── 100 nF ── GND
+                          ├──────────── D34
+                          └── 100 nF ── GND
 ```
 
 **Measure before attaching `D35` or `D34`.** Each `●` is one electrical junction. Each capacitor is a separate **100 nF ceramic**, often marked `104`. Leave both GPIO jumpers off and power the sensor you are testing. Put the meter in DC volts, black on GND, and red on its `●`. With nominal resistors, moisture's maximum rated 2.9 V signal becomes **1.45 V**. If the pH board's `A` signal reaches 5.0 V, its junction is about **2.38 V**. These are calculations. Investigate a negative reading, an unexpected voltage, or a pH junction above about **2.45 V** before connecting that signal. Turn all power off before attaching the GPIO jumper. [ESP32 analog-input guidance](https://docs.espressif.com/projects/esp-hardware-design-guidelines/en/latest/esp32/schematic-checklist.html#adc)
@@ -89,10 +89,26 @@ Use the GPIO number printed on the board, for example `D21`, `21`, or `IO21`. Th
 | SSD1306 I2C OLED | `SDA → D21`, `SCL` or I2C `SCK → D22` | Matching `VCC → 3V3`, `GND → GND`. Firmware address `0x3C`. |
 | DS3231 clock | `SDA → D21`, `SCL → D22` | Use a board rated for `3V3`, including its I2C pull-ups. `GND → GND`. Clock address `0x68`. Use only the backup cell specified for that breakout. |
 | 3.3 V SPI microSD board | `SCK → D18`, `MISO/DO → D19`, `MOSI/DI → D23`, `CS → D13` | Use the module's documented 3.3 V power input and GND. Insert the FAT32 card while power is off. |
-| DS18B20 temperature probe | `DQ → D4`, with **4.7 kΩ** from `D4` to `3V3` | `VDD → 3V3`, `GND → GND`. Verify the probe's wire labels. A four-band 4.7 kΩ resistor can be yellow, violet, red, gold. |
+| DS18B20 temperature probe and terminal adapter | Adapter `DAT → D4` (GPIO4) | Adapter `VCC → 3V3`, `GND → GND`. Follow the wire-color and resistor checks below. |
 | Scan and View buttons | Scan `D32 → switch → GND`, View `D33 → switch → GND` | Pick contacts that close when pressed. The firmware enables internal pull-ups. |
 | Red TTL485-V2.0 MAX3485 breakout | Adapter `TXD → D26`, adapter `RXD → D27` | `VCC → 3V3`, `GND → GND`. Automatic direction. The probe's confirmed RS485 wires go to `D+/A` and `D-/B`. |
 | Waveshare SIM7600G-H carrier | Modem `TXD → D16/RX2`, modem `RXD → D17/TX2`, `GND → GND` | Separate regulated **5 V / 3 A** bench supply at its documented USB input. Use its default 3.3 V logic with `VIO` open. Insert the SIM and attach the antenna before power-on. |
+
+### DS18B20 probe and terminal adapter
+
+Unplug USB and any other power before wiring. Put the probe's bare ends into the matching green screw terminals and tighten them. Then use the three jumpers from the adapter's pin header to the ESP32. Read the printed labels on both sides of the adapter.
+
+| Probe wire | Green screw terminal | Adapter header pin | ESP32 pin |
+| --- | --- | --- | --- |
+| Red | `VCC` | `VCC` | `3V3` |
+| Black | `GND` | `GND` | `GND` |
+| Yellow | `DAT` | `DAT` | `D4` or `GPIO4` |
+
+**Violet, gray, and white are the jumper wires.** Find which color you plugged into each adapter header pin, then connect the other end to the ESP32 pin in the same row. Use a continuity meter to trace the wires if you cannot follow them by eye. Use **3.3 V** for this adapter so its data line is also pulled up to 3.3 V. [Seller's adapter photo](https://down-ph.img.susercontent.com/file/sg-11134201-7rcee-lttejticwthj6e) · [Matching adapter wiring reference](https://www.auscomtech.com.au/support/guides/ds18b20-waterproof-temperature-sensor-probe-with-terminal-adapter-arduino-wiring-code-troubleshooting/)
+
+**Check the resistor on the adapter.** The seller's photo shows `472`, which means **4.7 kΩ**. With the adapter unplugged from both the ESP32 and the probe, set your meter to resistance and measure between `DAT` and `VCC`. If it reads about **4.7 kΩ**, use the adapter as it is. If the adapter has no pull-up, put one **4.7 kΩ** resistor between `DAT` and `3V3`. A four-band 4.7 kΩ resistor is yellow, violet, red, gold. The resistor connects across those two points. The `DAT` wire goes directly to `D4`. [DS18B20 datasheet, Figure 7](https://www.analog.com/media/en/technical-documentation/data-sheets/ds18b20.pdf#page=7)
+
+### Optional NPK and SMS
 
 **NPK probe.** Your probe wires are **blue, brown, black, and yellow**. Their roles are unverified. Keep all four wires disconnected until the manual for your unit identifies `A`, `B`, power positive, ground, and the supply voltage. Then power the probe from its verified supply and share ground with the non-isolated MAX3485. Check the adapter's `TTL485-V2.0` marking before using the pin table. Confirm the probe's Modbus address, baud rate, function, and first register before enabling NPK in the firmware. [Adapter listing and photos](https://shopee.ph/MAX3485-Module-TTL-To-RS485-Module-MCU-Development-Accessories-i.215434955.26054546212) · [The probe listing](https://makerlab.ph/products/rs485-output-3pin-probes-soil-npk-sensor-with-cable-2m)
 
@@ -102,11 +118,11 @@ The seller's photo shows the label **SOIL NPK STORAGE**. Ask the seller whether 
 
 ## 5. Test in this order
 
-1. **PC USB and moisture.** With `moistureEnabled = true`, send `read` in Serial Monitor. Record stable **Moisture input** readings in mV for dry and wet references at the same probe depth. Enter those measured endpoints and upload for your moisture index. The checked-in firmware has moisture enabled for raw mV and the calibration fields are still empty. [Sensor settings](../firmware/include/sensor_settings.h)
+1. **PC USB and moisture.** Check the divider voltage with `D35` disconnected. Turn off power before attaching `D35`. With `moistureEnabled = true`, send `read` in Serial Monitor. Record stable **Moisture input** readings in mV for dry and wet references at the same probe depth. Enter those measured endpoints and upload for your moisture index. The checked-in firmware has moisture enabled for raw mV and the calibration fields are still empty. [Sensor settings](../firmware/include/sensor_settings.h)
 2. **pH by itself.** Run the powered meter test with `D34` disconnected. In two labeled calibration buffers, record each exact pH and stable junction voltage. Rinse the probe tip between buffers. Connect `D34` with power off once the voltage check passes. Enable `phEnabled`, fill in the measured pH and mV pairs, upload, and verify `read`. Use the final wiring when calibrating. [DFRobot pH procedure](https://wiki.dfrobot.com/sen0161/docs/19898) · [Upload and monitor commands](../command.md)
-3. **Temperature, OLED, clock, and storage.** Add and check each part one at a time. Enable the temperature input after wiring it. If installed, set the clock in UTC with `rtc-set`. Use a soil-water sample cup for the liquid pH probe and use the moisture probe in soil. Press **Scan**, check the OLED, then hold **View** and open **Past Scans** to confirm the record is readable. Shut the reader down before removing the microSD card, then check the CSV in its `scans` folder on the PC. [Serial commands](../command.md)
+3. **Temperature, OLED, clock, and storage.** After checking the DS18B20 wiring, set `temperatureEnabled = true` in [sensor_settings.h](../firmware/include/sensor_settings.h), upload, and send `read` in Serial Monitor. Check for a room-temperature reading in °C, then warm the metal tip with your hand and check that the reading goes up. Add the remaining parts one at a time. If installed, set the clock in UTC with `rtc-set`. Use a soil-water sample cup for the liquid pH probe and use the moisture probe in soil. Press **Scan**, check the OLED, then hold **View** and open **Past Scans** to confirm the record is readable. Shut the reader down before removing the microSD card, then check the CSV in its `scans` folder on the PC. [Serial commands](../command.md)
 4. **Optional NPK and SMS.** Add NPK only after its manual checks. Add SMS after the device can save CSVs. Confirm handset receipt separately from modem submission.
-5. **Portable power.** Verify the DFR0559's 5 V output with a compatible battery and the panel disconnected. Move the ESP32 USB cable from the PC to the manager's `USB OUT`. Check the shared 5 V output under load during a scan and SD write. Keep within **1 A total** and watch for resets. Add the panel only after its input checks pass.
+5. **Portable power.** With the panel disconnected, use a compatible battery and verify the DFR0559's 5 V output. Disconnect power before moving wires. Unplug PC USB and disconnect the separate pH bench supply. Move the ESP32 USB cable to the manager's `USB OUT` and connect the pH board to the manager's red `5V` and black `GND` headers as shown in Section 1. Reconnect the battery and check that the shared 5 V output stays steady during a scan and SD write. Keep within **1 A total** and watch for resets. Add the panel only after its input checks pass.
 
 ## 6. What happens when you press Scan
 
