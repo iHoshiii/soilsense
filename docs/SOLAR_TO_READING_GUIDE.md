@@ -16,7 +16,7 @@ Use this list with the diagram. The LAFVIN kit already lists the ESP32 board, a 
 | Display and controls | 1 four-pin 128×64 I2C SSD1306 and 2 normally open momentary buttons for Scan and View. |
 | Storage and time | 1 compatible 3.3 V SPI microSD breakout and 1 FAT32 microSD card. Add 1 DS3231 and its board-specific backup cell for offline timestamps. Have a PC card reader if needed. |
 | Solar and battery | 1 DFR0559, the panel, 1 compatible 3.7 V rechargeable cell or pack, and an insulated matching holder or connector. Check the panel's raw DC output and the cell rating. Use the cooling pad and fin specified for the DFR0559 with the listed 10 W panel. |
-| Optional NPK | 1 MLE05243 probe, 1 confirmed 3.3 V `TTL485-V2.0` MAX3485 adapter, and a separate regulated supply rated for the probe. The probe wiring chart is still needed. |
+| Optional NPK | 1 MLE05243 probe, 1 red `TTL485-V2.0` MAX3485 adapter (Shopee item **51161753113**), and a separate regulated supply rated for the probe. The probe wiring chart is still needed. [Selected adapter](https://shopee.ph/1PCS-MAX3485-Module-TTL-To-RS485-Module-MCU-Development-Accessories-i.293710525.51161753113) |
 | Optional SMS | 1 Waveshare SIM7600G-H carrier, its matching LTE antenna, active SMS-capable nano-SIM, and a separate regulated 5 V / 3 A bench supply with a suitable cable. |
 | Final assembly | Enclosure, mounts, insulated leads or terminals, and cable strain relief. Select any master switch or fuse for the actual load and wiring. Make the screen, buttons, microSD, and power connections accessible. |
 | Calibration and checks | Multimeter, two pH calibration buffers or powders prepared as labeled, distilled water, pH electrode storage solution, and a clean soil-water sample cup. Use the matching reference instruments when doing thesis validation. |
@@ -91,7 +91,7 @@ Use the GPIO number printed on the board, for example `D21`, `21`, or `IO21`. Th
 | 3.3 V SPI microSD board | `SCK → D18`, `MISO/DO → D19`, `MOSI/DI → D23`, `CS → D13` | Use the module's documented 3.3 V power input and GND. Insert the FAT32 card while power is off. |
 | DS18B20 temperature probe and terminal adapter | Adapter `DAT → D4` (GPIO4) | Adapter `VCC → 3V3`, `GND → GND`. Follow the wire-color and resistor checks below. |
 | Scan and View buttons | Scan `D32 → switch → GND`, View `D33 → switch → GND` | Pick contacts that close when pressed. The firmware enables internal pull-ups. |
-| Red TTL485-V2.0 MAX3485 breakout | Adapter `TXD → D26`, adapter `RXD → D27` | `VCC → 3V3`, `GND → GND`. Automatic direction. The probe's confirmed RS485 wires go to `D+/A` and `D-/B`. |
+| Red TTL485-V2.0 MAX3485 breakout (item 51161753113) | Adapter `TXD → D26`, adapter `RXD → D27` | `VCC → 3V3`, `GND → GND`. The pictured board handles direction automatically. Leave D25 free. |
 | Waveshare SIM7600G-H carrier | Modem `TXD → D16/RX2`, modem `RXD → D17/TX2`, `GND → GND` | Separate regulated **5 V / 3 A** bench supply at its documented USB input. Use its default 3.3 V logic with `VIO` open. Insert the SIM and attach the antenna before power-on. |
 
 ### DS18B20 probe and terminal adapter
@@ -110,7 +110,14 @@ Unplug USB and any other power before wiring. Put the probe's bare ends into the
 
 ### Optional NPK and SMS
 
-**NPK probe.** Your probe wires are **blue, brown, black, and yellow**. Their roles are unverified. Keep all four wires disconnected until the manual for your unit identifies `A`, `B`, power positive, ground, and the supply voltage. Then power the probe from its verified supply and share ground with the non-isolated MAX3485. Check the adapter's `TTL485-V2.0` marking before using the pin table. Confirm the probe's Modbus address, baud rate, function, and first register before enabling NPK in the firmware. [Adapter listing and photos](https://shopee.ph/MAX3485-Module-TTL-To-RS485-Module-MCU-Development-Accessories-i.215434955.26054546212) · [The probe listing](https://makerlab.ph/products/rs485-output-3pin-probes-soil-npk-sensor-with-cable-2m)
+**NPK adapter.** The selected Shopee listing shows a red `TTL485-V2.0` board with a four-pin header and a blue three-screw block. With the header on your left and the blue block on your right, the front labels read top to bottom as shown below. Check that your delivered board matches these labels and uses a 3.3 V MAX3485 before powering it. [Selected adapter](https://shopee.ph/1PCS-MAX3485-Module-TTL-To-RS485-Module-MCU-Development-Accessories-i.293710525.51161753113) · [Front pin labels](https://down-ph.img.susercontent.com/file/7417ca5656a50bcf8e4d1faa3f25ece5) · [Back wiring diagram](https://down-ph.img.susercontent.com/file/6581a7a4387b908612651e32c7ba8b41) · [MAX3485 datasheet](https://www.analog.com/en/products/max3485.html)
+
+| Side | Printed labels, top to bottom | Connections in the same order |
+| --- | --- | --- |
+| ESP32 header | `VCC`, `TXD`, `RXD`, `GND` | ESP32 `3V3`, `D26` (RX), `D27` (TX), common `GND`. |
+| Blue screw block | `GND`, `D-/B`, `D+/A` | Common ground is already shared through the header. Connect confirmed probe B to `D-/B` and confirmed probe A to `D+/A`. |
+
+**NPK probe power.** Use a separate regulated DC supply within the probe's marked 5 to 30 V range. The model shows a **12 V bench example**. Connect the verified probe `V+` to supply positive and the verified probe `GND` to supply negative. Join supply negative to ESP32 `GND`. The adapter's `VCC` stays on 3.3 V. Keep the blue, brown, black, and yellow probe wires loose until the exact probe chart confirms their roles. Confirm the probe's Modbus address, baud rate, read function, and first register before enabling NPK. [Probe listing](https://makerlab.ph/products/rs485-output-3pin-probes-soil-npk-sensor-with-cable-2m) · [NPK scene in the Blender model](../models/blend-files/test.blend)
 
 The seller's photo shows the label **SOIL NPK STORAGE**. Ask the seller whether your unit produces new NPK measurements from soil or returns stored values. A successful serial reply only confirms communication. [MakerLab listing photo](https://shopee.ph/RS485-Output-3Pin-Probes-Soil-NPK-Sensor-with-Cable-2M-i.18252381.24586562886)
 
@@ -127,3 +134,5 @@ The seller's photo shows the label **SOIL NPK STORAGE**. Ask the seller whether 
 ## 6. What happens when you press Scan
 
 **Solar charging or battery → DFR0559 → ESP32 and sensors → Scan → OLED results and microSD CSV → Past Scans.** A scan saves when it has at least one usable reading and the SD write succeeds. A configured, idle modem may submit an SMS after a successful save. OLED readings and microSD storage work offline. Wi-Fi is optional and Bluetooth pairing is still pending in the firmware. [Firmware capture flow](../firmware/src/main.cpp) · [OLED menu](../firmware/src/display.cpp)
+
+The NPK data path is **probe ↔ MAX3485 (item 51161753113) ↔ ESP32 D26/D27**. The probe uses its separate supply and the ESP32 powers the adapter through `3V3`. [NPK firmware](../firmware/src/npk.cpp)

@@ -23,7 +23,7 @@ Start with the OLED and buttons from your LAFVIN kit. The kit lists a 0.96-inch 
 ## Check your remaining parts
 
 - Check for two 100 nF ceramic capacitors for the pH and moisture inputs. Have a 4.7 kΩ resistor available if the DS18B20 adapter has no built-in pull-up. Use a multimeter to check resistor values and supply voltages. [Wiring and materials](SOLAR_TO_READING_GUIDE.md#materials-check)
-- You already have the NPK probe. Its label marks 5 to 30 V DC and RS485. Keep its four wires loose until you have the exact wire chart and can check the probe supply. [NPK adapter model](../models/blend-files/test.blend)
+- The selected NPK adapter is the red **TTL485-V2.0 MAX3485, Shopee item 51161753113**. The separate NPK probe is marked 5 to 30 V DC and RS485. Keep its four wires loose until you have the exact wire chart and can check the probe supply. [Selected adapter](https://shopee.ph/1PCS-MAX3485-Module-TTL-To-RS485-Module-MCU-Development-Accessories-i.293710525.51161753113) · [NPK adapter model](../models/blend-files/test.blend)
 - For the enclosure, check that the OLED, buttons, microSD slot, and power switch are reachable. Allow room for the probe cables and strain relief. Keep the LTE antenna away from the pH signal wire.
 
 Test the OLED and buttons first, then save a scan to microSD and open it in Past Scans. Add the clock if the test needs offline dates and times. Verify text receipt on a phone using a separate modem supply. The [bench test checklist](../firmware/HARDWARE_CHECKLIST.md) covers these checks.
