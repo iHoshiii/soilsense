@@ -1,88 +1,31 @@
-# Shopee Philippines purchasing checklist
+# Buying list for the Hybrid Multi-Sensor Soil Reader
 
-Research date: 5 November 2026. One proposed analyzer. See the [complete device-to-testing checklist](COMPLETE_MATERIALS_AND_TESTING_BUDGET.md) for reference instruments, services, and overall project costs.
+Start with the OLED and buttons from your LAFVIN kit. The kit lists a 0.96-inch OLED and six push buttons. Check the screen label and test it on USB before ordering a replacement. Reuse your ESP32, sensors, and MAX3485 adapter. [LAFVIN kit contents](https://lafvintech.com/products/lafvin-basic-starter-kit-for-esp32-esp-32s-wifi-i-ot-development-board-for-arduino-project-learning-kit-with-tutorials)
 
-These are **candidate listings**, not a confirmed compatible shopping cart. Prices below are amounts returned by public listing pages or search-index snapshots; checkout prices, exact variants, stock, authenticity, delivery fees, and seller identity have not been independently verified. Search snapshots can be old. A listing with a known model name is not proof that the delivered part is genuine. No seller has been contacted and no purchase made.
+## Screen, storage, and clock
 
-## 1. Core device listings found
-
-Buy one of each selected component. Alternatives replace a row; they are not extra purchases.
-
-| Component | Candidate Shopee listing | Displayed/indexed PHP | Status and selection conditions |
-| --- | --- | ---: | --- |
-| ESP32 development board | [ESP32 38Pin Development Board](https://shopee.ph/ESP32-38Pin-Development-Board-i.1646651452.40622889424) | 299 | Generic candidate; the title alone does not establish that it is an original Espressif DevKitC. Confirm module marking, pin map, regulator, USB connector, and flash capacity. |
-| DFRobot pH V2 kit | [MakerLab: Gravity Analog pH Sensor/Meter Kit V2](https://shopee.ph/DFRobot-Gravity-Analog-pH-Sensor-Meter-Kit-V2-i.18252381.2633566478) | 5,649 | Opened page displayed this price. Confirm SEN0161-V2 and inclusion of electrode, interface board, and cable. The cheaper PH-4502C and original SEN0161 are different designs. |
-| Alternate pH V2 source | [Createlabz: Gravity Analog pH Sensor/Meter Kit V2](https://shopee.ph/DFRobot-Gravity-Analog-pH-Sensor-Meter-Kit-V2-i.66722864.7058347494) | 3,070 | Search snapshot displayed sold out; price may involve a voucher. Do not treat as an available lower-cost order. |
-| DFRobot capacitive moisture sensor, alternate model | [MakerLab: SEN0308 waterproof capacitive sensor](https://shopee.ph/DFRobot-Gravity-Analog-Waterproof-Capacitive-Soil-Moisture-Sensor-SEN0308-i.18252381.23055744537) | 1,175 | **SEN0308 is different from the previously budgeted SEN0193.** It is a candidate replacement, not an additional sensor. Update the actual hardware description and calibration if selected. |
-| DS18B20 waterproof probe | [easyelectronyx: DS18B20 waterproof sensor](https://shopee.ph/DS18b20-WATERPROOF-TEMPERATURE-SENSOR-for-ARDUINO-ESP8266-NODEMCU-RPI-i.752842668.16558551674) | 85 | Older indexed price. Generic probe; confirm a three-wire unit, cable length and supply specification; compare with a calibrated thermometer. |
-| 3.3 V RS485 interface | [donskytech: MAX3485 converter module](https://shopee.ph/TTL-To-RS485-MAX3485-Converter-Module-i.1090440049.27604497357) | 199 | Indexed price; reopened page required JavaScript. Confirm actual transceiver, 3.3 V supply/logic and DE/RE direction control. Do not substitute an unchecked 5 V MAX485 board. |
-| NPK probe, provisional | [MakerLab: RS485 three-pin probe, 2 m cable](https://shopee.ph/RS485-Output-3Pin-Probes-Soil-NPK-Sensor-with-Cable-2M-i.18252381.24586562886) | 2,199 | **Opened page displayed sold out.** Manufacturer/model and register map still required. Borrow/test first; the listing does not establish nutrient accuracy. |
-
-The six component references using the MakerLab pH kit, SEN0308, and provisional NPK price total **9,606 PHP** (299 + 5,649 + 1,175 + 85 + 199 + 2,199). The alternate pH source is excluded from this sum. This is **not a complete or currently orderable device total**: it includes an unavailable probe and mixed-date listing prices, and excludes power, construction, calibration, delivery, reserve, and laboratory costs.
-
-Technical basis for considering SEN0308: [DFRobot specifications](https://wiki.dfrobot.com/sen0308/) list a 3.3–5.5 V supply and 0–2.9 V analog output. The analog input still needs proper range configuration/input conditioning and soil calibration. It does not automatically produce validated moisture percentages.
-
-## 2. Power: Shopee candidate found, design still pending
-
-[Waveshare Solar Power Manager (D) listing](https://shopee.ph/Waveshare-Solar-Power-Manager-Module-%28D%29-Supports-6V~24V-Solar-Panel-and-Type-C-Power-Adapter-5V-3A-for-Raspberry-Pi-Arduino-i.345394400.51516350811) showed an indexed **932–1,052 PHP** range with two variants. Verify the exact module and holder inclusion.
-
-[Waveshare's manufacturer page](https://www.waveshare.com/product/modules/solar-power-manager-d.htm) specifies 6–24 V solar input, a 3.7 V rechargeable lithium-battery arrangement, and regulated 5 V output up to 3 A. Those ratings apply to the documented manufacturer product, not automatically to any similarly titled listing. Available output depends on the battery, panel, wiring, and operating conditions.
-
-This is an **alternative design to DFRobot DFR0559**, not an extra charger to add to it. Before buying the power group, the freelancer must specify:
-
-| Item | Search/model specification | What remains to confirm |
+| Qty | Order or search for | Match before buying |
 | --- | --- | --- |
-| Solar manager | Waveshare Solar Power Manager (D), exact revision | Charging current/settings, low-current behavior, protection, connectors and delivered variant. |
-| Solar panel | Candidate: 6 V, about 5 W panel for this controller | Open-circuit voltage within the controller limit, connector/polarity, measured load and realistic charging budget. A regulated 5 V panel is not automatically interchangeable with its 6–24 V solar input. |
-| Battery and mounting/holder | Documented 3.7 V nominal compatible battery arrangement | Genuine cells or assembled pack, correct holder wiring, charge/discharge current and polarity. Do not assume any two-cell holder is suitable. The manufacturer's optional holder differs from the paper's draft two-cell illustration. |
-| Required converter for NPK | Regulated output matching the exact probe, e.g. 12 V if required | Input range, startup behavior, output current, ripple and load. A converter's advertised peak current is not a verified continuous output rating. |
-| Switch, wire and circuit protection | Ratings appropriate to the final circuit | Placement, current capacity, connections and any fuse/protection required by the design. |
+| 1 if needed | DFRobot DFR0486 OLED | SSD1306, 0.96-inch, 128 × 64, I2C. Power from ESP32 `3V3`. The firmware uses address `0x3C`. If testing a kit OLED, check for `VCC`, `GND`, `SDA`, and `SCL` or `SCK` on the board. [DFRobot display](https://wiki.dfrobot.com/dfr0486/) · [I2C address](https://github.com/DFRobot/I2C_Addresses/blob/master/README.md) |
+| 1 | Adafruit #4682 microSD breakout | This is the board the card plugs into. It uses 3.3 V for both power and signals. Use SPI with `CLK`, `SO`, `SI`, and `CS`. Match both the supply and signal voltage if buying another board. [Adafruit pinout](https://learn.adafruit.com/adafruit-microsd-spi-sdio/pinouts) |
+| 1 | 32 GB microSDHC card, such as SanDisk Ultra 32 GB | Use FAT32. An 8 or 16 GB microSDHC card formatted FAT32 also fits the project. Add a USB microSD card reader if your PC has no suitable reader. [SD Association](https://www.sdcard.org/developers/sd-standard-overview/capacity-sd-sdhc-sdxc-sduc/) |
+| 1 each | Adafruit #3013 DS3231 clock and CR1220 coin cell | Add these when you need scan dates and times offline. This board uses a CR1220, sold separately. The clock and OLED share the D21 and D22 wires. Check the required cell if buying a different DS3231 board. [Adafruit clock](https://www.adafruit.com/product/3013) · [Clock pinout](https://learn.adafruit.com/adafruit-ds3231-precision-rtc-breakout/pinouts) |
+| 2 | Normally open momentary buttons | Use the kit buttons for Scan and View. Buy panel buttons if you need them for the finished enclosure. |
 
-Do not automatically combine this manager with the earlier Adafruit battery recommendation until charging-current compatibility is confirmed. A separate TP4056 and 5 V boost board may duplicate functions already supplied by the selected solar manager. No complete Shopee power bundle has been approved here.
+## Optional SMS
 
-## 3. Remaining construction materials: search checklist
-
-These are **search terms and quantity guidance**, not verified product listings or price quotations.
-
-| Material | Starting quantity | Suggested Shopee search / selection note |
+| Qty | Order or search for | Match before buying |
 | --- | --- | --- |
-| Solderless breadboard | 1; possibly two if needed for board width | `MB102 830 tie points solderless breadboard`; ensure accessible rows beside the ESP32. |
-| Jumper/hookup wire | 1 mixed set | `Dupont male male male female female female jumper wire 2.54mm`; select ends actually required. |
-| Resistors | 1 small assortment | `4.7k resistor 1 percent` plus values specified for input conditioning. |
-| Power switch | 1 | `panel mount rocker switch`; select DC voltage/current rating. |
-| Momentary button | 1 | `momentary push button normally open`; match mounting/wiring. |
-| USB data cable | 1 | Match actual board: micro-USB or USB-C; data capable. |
-| Enclosure and lid | 1 | `ABS project enclosure`; size only after a component layout. |
-| Cable glands and connectors | Per probe/power entry | `waterproof cable gland`, suitable terminal blocks and connector sets; choose cable diameters. |
-| Mounting parts | 1 set | `M3 nylon standoff screws`, cable ties, heat-shrink, appropriate insulation and seals. |
-| pH suspension cup | 1 dedicated cup | Clean suitable beaker/cup; separate from rinse/preparation vessels. |
+| 1 | Waveshare SIM7600G-H 4G Module, global version, with LTE antenna | Choose the pre-soldered version with an SMA antenna connector and matching antenna for easier assembly. Check for a USB-C port, nano-SIM slot, and 3.3 V UART pins. Keep `VIO` open for 3.3 V signals. Modem TXD connects to D16, RXD to D17, and GND to ESP32 GND. [Waveshare module](https://www.waveshare.com/product/sim7600g-h-4g-module.htm) · [Waveshare manual](https://www.waveshare.com/wiki/SIM7600G-H_4G_Module) |
+| 1 | Active LTE nano-SIM with outgoing SMS | Choose a carrier that serves the test site. Test an ordinary text to a phone using your exact SIM and modem. When a recipient is set and the modem is idle, the firmware attempts a text after a confirmed microSD save. [SMS firmware](../firmware/src/sms.cpp) |
+| 1 | Separate regulated 5 V / 3 A bench supply and suitable USB-C cable | Power the modem through its documented 5 V USB input. Use its own supply during the SMS test and validate a portable modem supply under load. [Waveshare modem power inputs](https://www.waveshare.com/wiki/SIM7600G-H_4G_Module) |
 
-## 4. Calibration and sample supplies: search checklist
+## Check your remaining parts
 
-| Material | Starting quantity | Selection note |
-| --- | --- | --- |
-| Certified pH buffers | Two points; third if method requires | Search for original sealed buffers with certified value, lot and expiry, e.g. documented Hanna buffer products. Use the actual values in calibration; 6.86, 7.00 and 7.01 are not identical. Select the calibration procedure before buying. |
-| Electrode storage/cleaning solution | 1 initial set | Manufacturer-compatible electrode-care products; subtract kit inclusions. |
-| Distilled/deionized water | Initial 2–5 L allowance | Grade and quantity required by the selected method; local laboratory supply may be more practical than delivery. |
-| Wash bottle | 1 | `laboratory wash bottle`; appropriate clean material. |
-| Preparation beakers/cups, volume measure and stirring tools | 1 preparation set | Borrow suitable lab glassware if available; do not buy the device cup twice. |
-| Soil sample bags, labels and marker | Sample count plus spares | Durable labels and correct bag/sample size for the receiving laboratory. |
-| Gloves, wipes and waste bags | Test-plan dependent | Follow the laboratory's handling procedure. |
-| Moisture tins / heat-safe containers | Simultaneous test capacity | Lab-approved material; preferably borrow. |
-| Sieve, trowel/auger and mixing bucket/tray | 1 suitable collection set | Size and preparation method set by the adviser/lab; reuse/borrow where appropriate. |
+- The portable reader uses the **Waveshare Solar Power Manager (D)**, Shopee item **51516350811**. Confirm the matching three-slot parallel holder or a compatible 3.7 V pack and check the solar panel's raw DC output. [Selected manager](https://shopee.ph/Waveshare-Solar-Power-Manager-Module-%28D%29-Supports-6V~24V-Solar-Panel-and-Type-C-Power-Adapter-5V-3A-for-Raspberry-Pi-Arduino-i.345394400.51516350811) · [Waveshare manual](https://www.waveshare.com/wiki/Solar_Power_Manager_%28D%29)
 
-## 5. Testing equipment and services
+- Check for two 100 nF ceramic capacitors for the pH and moisture inputs. Have a 4.7 kΩ resistor available if the DS18B20 adapter has no built-in pull-up. Use a multimeter to check resistor values and supply voltages. [Wiring and materials](SOLAR_TO_READING_GUIDE.md#materials-check)
+- The selected NPK adapter is the red **TTL485-V2.0 MAX3485, Shopee item 51161753113**. The separate NPK probe is marked 5 to 30 V DC and RS485. Use the seller-confirmed wire colors and a separate regulated supply for the probe. [Selected adapter](https://shopee.ph/1PCS-MAX3485-Module-TTL-To-RS485-Module-MCU-Development-Accessories-i.293710525.51161753113) · [NPK power and wiring](SOLAR_TO_READING_GUIDE.md#optional-npk-and-sms)
+- For the enclosure, check that the OLED, buttons, microSD slot, and power switch are reachable. Allow room for the probe cables and strain relief. Keep the LTE antenna away from the pH signal wire.
 
-Do not replace university reference instruments with an unverified cheap Shopee tester simply to complete a cart. Arrange suitable calibrated pH and temperature references, oven/balance/desiccator access, multimeter/power measurements, and independent nutrient laboratory analysis. These are listed fully in the [complete budget checklist](COMPLETE_MATERIALS_AND_TESTING_BUDGET.md).
-
-Shopee can supply assembly tools and ordinary accessories, but laboratory analysis and expert advisory validation are separate services. A cheap pH pen or NPK meter is not automatically an adequate reference standard. No new laptop, phone, router or laboratory instrument purchase is assumed when suitable existing access is available.
-
-## 6. Current purchasing position
-
-- Candidate Shopee listings exist for the core device parts; some exact premium models could not be verified in stock.
-- The SEN0308 and Waveshare power manager are proposed alternatives. Neither has been silently substituted into the thesis, schematic, firmware or earlier budgets.
-- Keep the NPK probe and power-group purchases pending their documented selection and feasibility checks.
-- Ask the freelancer for one itemized selection containing exact listing, variant, quantity, pin map/schematic, rated supply and final delivered price. Do not treat separate low-price listings as a compatible bundle.
-- Record all delivery charges and reimbursement responsibility. Do not add this partial subtotal to the previous full prototype budget: its core parts overlap.
-
-No OLED, microSD, standalone RTC, GPS or perfboard is added. Do not order every alternative listed in this document.
+Test the OLED and buttons first, then save a scan to microSD and open it in Past Scans. Add the clock if the test needs offline dates and times. Verify text receipt on a phone using a separate modem supply. The [bench test checklist](../firmware/HARDWARE_CHECKLIST.md) covers these checks.

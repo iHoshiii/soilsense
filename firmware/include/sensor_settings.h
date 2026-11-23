@@ -7,8 +7,16 @@ constexpr bool temperatureEnabled = false;
 constexpr int temperaturePin = 4;
 constexpr bool phEnabled = false;
 constexpr int phPin = 34;
-constexpr bool moistureEnabled = false;
+constexpr bool moistureEnabled = true;
 constexpr int moisturePin = 35;
+constexpr bool npkEnabled = false;
+constexpr int npkRx = 26, npkTx = 27;
+// Use -1 for automatic direction or GPIO25 for a breakout with DE and /RE.
+constexpr int npkDirection = -1;
+constexpr uint32_t npkBaud = 4800;
+constexpr uint8_t npkAddress = 1, npkFunction = 3;
+// The seller manual lists N, P and K in consecutive registers 0x0003 to 0x0005.
+constexpr int npkFirstRegister = 0x0003;
 // Replace NAN with measured calibration points, never guessed constants.
 constexpr float phMillivoltsA = NAN;
 constexpr float phValueA = NAN;
