@@ -10,7 +10,7 @@ Use this guide with a classic ESP32-WROOM-32 or ESP-32S DevKit. Match the **GPIO
 
 ## 2. Wire it with your breadboard
 
-[Open the breadboard layout](images/design/esp32-bench-wiring.png).
+[Open the current wiring model](../models/blend-files/solar_to_reading.blend). See scene **02 Power and grounding** for the rails and scene **03 Moisture pH and resistors** for the analog inputs.
 
 The middle has **two groups of five holes per row**. For row 6, A6 to E6 are one connection. F6 to J6 are a different connection across the gap. Row 7 is separate from row 6. Here, **L6** means any hole from A6 to E6 and **R6** means any hole from F6 to J6. Put wires that share a connection in different holes of the same group.
 
@@ -25,9 +25,9 @@ Use these example rows or copy the same pattern onto other free rows. For shared
 | SSD1306 I2C OLED | `VCC` to left `+`, `GND` to left `-` | `SDA` and GPIO21 to **L6**. `SCL` and GPIO22 to **L7**. Some boards mark the I2C clock `SCK`. |
 | DS3231 clock (planned) | Board supply to left `+` if rated for 3.3 V, `GND` to left `-` | `SDA` to **L6** and `SCL` to **L7**. The clock and screen share the same two wires. |
 | 3.3 V SPI microSD board | `3V` or documented 3.3 V supply to left `+`, `GND` to left `-` | `CLK/SCK` with GPIO18 at **L8**, `SO/MISO` with GPIO19 at **L9**, `SI/MOSI` with GPIO23 at **L10**, and `CS` with GPIO13 at **L11**. |
-| DS18B20 probe | Verified `VDD` to left `+`, `GND` to left `-` | `DQ` and GPIO4 to **L12**. Add a **4.7 kΩ** resistor from another hole in L12 to left `+`. Check probe wire roles on its own label or manual. |
+| DS18B20 probe and adapter | Adapter `VCC` to left `+` (3.3 V), `GND` to left `-` | Adapter `DAT` and GPIO4 to **L12**. Use the adapter's built-in **4.7 kΩ** pull-up if fitted. Otherwise add it from **L12** to left `+`. [Probe colors and adapter checks](SOLAR_TO_READING_GUIDE.md#ds18b20-probe-and-terminal-adapter) |
 | DFRobot SEN0161 pH kit | Board `+` to right `+`, board `-` to right `-` | Probe plugs into the board's **BNC** socket. Board pin `A` goes to **L15** and passes through the pH divider below to GPIO34. |
-| DFRobot SEN0308 moisture probe | `VCC` to left `+`. Connect both documented `GND` leads to ground. | `Signal` goes to **R15** and passes through the moisture divider below to GPIO35. DFRobot marks red as VCC, yellow as Signal, and both black leads as GND. |
+| DFRobot SEN0308 moisture probe | Red to the left **3.3 V** `+` rail. Both black leads to ground. | For direct wiring, connect yellow and GPIO35 to **R15** after the voltage check below. |
 | Scan button | One switched contact to GND | Other switched contact to GPIO32. Example group for the GPIO wire is **L25**. |
 | View button | One switched contact to GND | Other switched contact to GPIO33. Example group for the GPIO wire is **L29**. |
 
@@ -35,30 +35,29 @@ For each four-leg button, use the meter to pick two legs that are **open when re
 
 Check that OLED and RTC I2C pull-ups go to **3.3 V**. The OLED address in the firmware is `0x3C`. The DS3231 address is `0x68`. Use the backup cell type specified by your exact RTC board. Insert a FAT32 card only with power off. [Adafruit RTC pinout](https://learn.adafruit.com/adafruit-ds3231-precision-rtc-breakout/pinouts) · [Adafruit 3.3 V microSD pinout](https://learn.adafruit.com/adafruit-microsd-spi-sdio/pinouts) · [DS18B20 pull-up](https://support.analog.com/en-US/knowledgebase/article/000094969)
 
-### Put these dividers between the sensors and the ESP32
+### Wire the pH divider and moisture input
 
-Each **ADC point** is the place where the two resistors meet. GPIO34 or GPIO35 goes to that point. Connect a **100 nF ceramic capacitor** from each ADC point to GND, close to the ESP32 if possible. The resistor values are build choices for this wiring, and the two channels use different values. [ESP32 ADC guidance](https://docs.espressif.com/projects/esp-hardware-design-guidelines/en/latest/esp32/schematic-checklist.html#adc) · [DFRobot SEN0161](https://wiki.dfrobot.com/sen0161) · [DFRobot SEN0308](https://wiki.dfrobot.com/sen0308)
+Connect each ESP32 input at the dot shown below. Keep a **100 nF ceramic capacitor** from each input to GND, close to the ESP32 if possible. [ESP32 ADC guidance](https://docs.espressif.com/projects/esp-hardware-design-guidelines/en/latest/esp32/schematic-checklist.html#adc) · [DFRobot SEN0161](https://wiki.dfrobot.com/sen0161) · [DFRobot SEN0308](https://wiki.dfrobot.com/sen0308)
 
 ```text
 pH board A ---- 12 kΩ ----●---- 10 kΩ ---- GND
                           ├--------------- GPIO34
                           └---- 100 nF --- GND
 
-Moisture OUT -- 10 kΩ ----●---- 20 kΩ ---- GND
-                          ├--------------- GPIO35
+Moisture OUT -------------●--------------- GPIO35
                           └---- 100 nF --- GND
 ```
 
 | Channel | Row-by-row placement on the breadboard |
 | --- | --- |
 | pH | Put `A` at **L15**. Put **12 kΩ** from **L15** to **L18**, then **10 kΩ** from **L18** to GND. GPIO34 and the capacitor's first leg also go to **L18**. If you only have kit values, build the 12 kΩ leg with 10 kΩ from L15 to L16, 1 kΩ from L16 to L17, and 1 kΩ from L17 to L18. |
-| Moisture | Put `Signal` at **R15**. Put **10 kΩ** from **R15** to **R16**. From **R16**, run **20 kΩ** to GND, or use 10 kΩ from R16 to R17 and another 10 kΩ from R17 to GND. GPIO35 and the capacitor's first leg go to **R16**. |
+| Moisture | Put yellow and the capacitor's first leg at **R15**. Add GPIO35 to **R15** after the voltage check. |
 
-Put each capacitor's other leg on GND. Before connecting GPIO34 or GPIO35, power the sensor and measure its divider point with the black meter lead at GND. With nominal resistors, a **5.0 V** pH output would give about **2.27 V** at the GPIO34 point. The SEN0308's **2.9 V** maximum output would give about **1.93 V** at the GPIO35 point. These are calculated divider values. If a point reads above about **2.45 V** or below GND, inspect the wiring and verify the sensor output before attaching the ESP32. Then switch the supplies off, connect the GPIOs, and calibrate using the voltage at each ADC point with the divider installed. [ESP32-WROOM-32 ADC characteristics](https://documentation.espressif.com/esp32-wroom-32_datasheet_en.html)
+Put each capacitor's other leg on GND. Before attaching either GPIO, measure its signal point with the black meter lead at GND. With the pH divider above, a **5.0 V** pH output would give about **2.27 V** at the GPIO34 point. For direct moisture wiring, check that the dry and wet reference readings are within about **0.15 to 2.45 V**. Use the optional two-resistor moisture divider if the signal is above **2.45 V** within the sensor's **2.9 V** rating. Investigate any voltage outside the expected range. Switch off before attaching the GPIOs and calibrate with the final wiring in place. [Moisture voltage check and optional divider](SOLAR_TO_READING_GUIDE.md#dfrobot-sen0308-moisture-sensor)
 
 ## 3. Wire it without a breadboard
 
-[Open the direct wiring layout](images/design/esp32-direct-wiring.png).
+[Open the current pin diagram](../models/images/solar_to_reading.png).
 
 1. Use insulated locking connectors or a soldered perfboard for permanent connections. Make one **3.3 V distribution point**, one **5 V pH distribution point**, and one **common GND point**. An insulated terminal block with linked ports can serve each point. Keep the positive terminals separate and label the wires at both ends.
 2. Wire OLED and RTC `SDA` together with GPIO21 and their `SCL` together with GPIO22. Connect the other signals point to point.
@@ -66,9 +65,9 @@ Put each capacitor's other leg on GND. Before connecting GPIO34 or GPIO35, power
    | Signal wire | Direct connection |
    | --- | --- |
    | Card `CLK/SCK`, `SO/MISO`, `SI/MOSI`, `CS` | GPIO18, GPIO19, GPIO23, GPIO13 respectively |
-   | DS18B20 `DQ` | GPIO4, with 4.7 kΩ from GPIO4 to 3.3 V |
+   | DS18B20 adapter `DAT` | **D4** (GPIO4). Adapter `VCC → 3V3` and `GND → GND`. Add **4.7 kΩ** from GPIO4 to 3.3 V only if the adapter has no pull-up. [Probe colors and adapter checks](SOLAR_TO_READING_GUIDE.md#ds18b20-probe-and-terminal-adapter) |
    | pH `A` | Through the 12 kΩ/10 kΩ divider to GPIO34 |
-   | Moisture `Signal` | Through the 10 kΩ/20 kΩ divider to GPIO35 |
+   | Moisture `Signal` | Yellow directly to GPIO35 after the voltage check above. Use the optional divider if the measured signal needs it. |
    | Scan, View | GPIO32 to GND through Scan. GPIO33 to GND through View. |
 3. Solder or fasten each divider and capacitor close to the ESP32. Insulate the ADC junctions and exposed resistor legs. Keep probe signal wires away from the modem's power leads and antenna. Attach the cables to the case so a pull on a probe does not pull on the contacts.
 4. Use the module's own labeled power pins as listed in the breadboard table. The two optional modules below use the same signal connections in both builds. Route their supply returns straight back to their supplies and connect their grounds to the common GND point for the signals.
@@ -82,17 +81,16 @@ Put each capacitor's other leg on GND. Before connecting GPIO34 or GPIO35, power
 
 ### MAX3485 and RS485 NPK probe
 
-- For a confirmed **3.3 V MAX3485 board**, connect `VCC` to **3.3 V** and `GND` to common GND. Connect `RO` to **GPIO26** and `DI` to **GPIO27**. Join `DE` and active-low `/RE` and connect that junction to **GPIO25**. In the breadboard build, you can use **L21**, **L22**, and **L23** respectively for those junctions. If the breakout has automatic direction or a different pinout, check its board documentation before using this map. [MAX3485 datasheet](https://www.analog.com/en/products/max3485.html)
-- Connect probe `A/B` to the matching bus signals on the breakout once the probe manual identifies its wires and polarity. Use the `A/B` pair for data only. Connect the probe's confirmed power leads to its own regulated supply at the voltage specified for the actual unit. Join its ground with the signal ground for this non-isolated breakout. Leave termination and bias as specified for the actual modules and cable. MakerLab's listing gives **5 to 30 V**, but it does not identify the power-wire colors or register map. Keep the probe unpowered until those are confirmed. [MakerLab listing for MLE05243](https://makerlab.ph/products/rs485-output-3pin-probes-soil-npk-sensor-with-cable-2m)
-- Keep NPK disabled until you have the baud rate, address, function and register map. The current firmware expects three consecutive N, P and K registers and saves raw values.
+- For the selected red **TTL485-V2.0 MAX3485 board (Shopee item 51161753113)**, connect `VCC` to **3V3**, `GND` to common **GND**, adapter `TXD` to ESP32 **GPIO26**, and adapter `RXD` to **GPIO27**. The back photo shows the TX/RX crossing. The pictured board handles direction automatically, so use `npkDirection = -1` and leave **GPIO25** free. Check the delivered board's chip and labels before using this map. [Selected adapter](https://shopee.ph/1PCS-MAX3485-Module-TTL-To-RS485-Module-MCU-Development-Accessories-i.293710525.51161753113) · [Front pin labels](https://down-ph.img.susercontent.com/file/7417ca5656a50bcf8e4d1faa3f25ece5) · [Back wiring diagram](https://down-ph.img.susercontent.com/file/6581a7a4387b908612651e32c7ba8b41) · [MAX3485 datasheet](https://www.analog.com/en/products/max3485.html)
+- If using a different 3.3 V MAX3485 breakout with **separate `RO`, `DI`, `DE`, and `/RE` pins**, connect `RO` to **GPIO26**, `DI` to **GPIO27**, and join `DE` and `/RE` at **GPIO25**. Set `npkDirection = 25` for that board.
+- The seller confirmed probe **brown → separate supply positive**, **black → supply negative**, **yellow → MAX3485 `D+/A`**, and **blue → MAX3485 `D-/B`**. Join supply negative to ESP32 GND. The adapter shares ground through its four-pin header. The probe is rated **5 to 30 V DC** and the model shows a **12 V DC** bench supply. Leave termination and bias as specified for the actual modules and cable. [Probe listing](https://makerlab.ph/products/rs485-output-3pin-probes-soil-npk-sensor-with-cable-2m) · [Complete power and pin map](SOLAR_TO_READING_GUIDE.md#optional-npk-and-sms)
+- For a bench read, the factory map in the seller's manual is **4800 baud, 8N1, address `0x01`, function `0x03`, first register `0x0003`**. The ESP32 reads three consecutive registers. The manual describes them as stored or conductivity-based values. Keep NPK disabled for normal scans until you have tested the unit and validated its use. [Seller's reference manual](https://docs.google.com/document/d/1NHSvvIz9n-pFXRNgBlQDSRO91LF0v0aD/edit)
 
 ## 5. Switch to the Waveshare solar and battery supply
 
-Bench-test on USB before adding the battery and panel. Use the **Waveshare Solar Power Manager (D)** with its matching factory holder. The holder's three slots share a **3.7 V nominal parallel connection**. Follow the maker's polarity marks and use matched, undamaged cells of the same type and charge state. If you cannot verify the three cells you already have, leave the holder empty and use bench power. Use the factory plug for the holder. Keep cell power and charging wires off the breadboard.
+Bench-test on laptop USB before adding the battery and panel. Connect the **Waveshare Solar Power Manager (D)** to a verified **3.7 V nominal** battery setup, then check for 5 V at its output. Use the white connector with the factory three-slot parallel holder, or the `Bat+` and `Bat-` screws with a verified compatible pack. Keep an unverified two-slot holder disconnected. [Complete battery and solar checks](SOLAR_TO_READING_GUIDE.md#1-solar-panel-power-manager-and-18650) · [Waveshare manual](https://www.waveshare.com/wiki/Solar_Power_Manager_%28D%29)
 
-The module accepts **6 to 24 V DC at SOLAR IN** and provides **5 V at up to 3 A** on its regulated output. Use the panel only after you verify a compatible DC solar output on the actual connector. The **6 V, 10 W** seller rating alone does not verify that the panel's USB ports deliver a suitable solar input. Check the output voltage and polarity with the panel disconnected from the manager, then verify it stays within the input range under load. [Waveshare Solar Power Manager (D) manual](https://www.waveshare.com/wiki/Solar_Power_Manager_%28D%29)
-
-Connect the verified **5 V output** to the ESP32 board's documented **5 V power input** and to the pH board's 5 V branch. Connect output **GND** to the common GND point. Unplug the PC USB cable before feeding the ESP32 through its 5 V header. A board-specific 5 V input label may be `5V` or `VIN`. Use the ESP32 **3V3** rail for the same low-current modules if its regulator can support them. Keep the modem on its verified separate supply until testing confirms that a portable power design can handle its transmit bursts along with the reader. [Espressif DevKit power options](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html)
+Unplug PC USB and use the manager's `TYPE-C` in output mode to power the ESP32 through its USB port. Use the manager's `5V OUT` screws for the pH board's 5 V and common GND. Verify the shared 5 V output during a scan and save, then connect verified **6 to 24 V raw DC** from the panel to `SOLAR IN`. Give the modem and NPK probe their separate supplies as shown above.
 
 ## 6. Test one part at a time
 
