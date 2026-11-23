@@ -29,7 +29,7 @@ The desktop preview uses simulated sensor and module results. It runs locally an
 
 ## Proposed pin map
 
-Use the [step-by-step wiring guide](../docs/WIRING_GUIDE.md) with a classic ESP32-WROOM-32 DevKit. It gives the [breadboard layout](../docs/images/design/esp32-bench-wiring.png), the [direct wiring layout](../docs/images/design/esp32-direct-wiring.png), and the power connections. With power off, match the **GPIO numbers** to the labels on the actual board.
+Use the [step-by-step wiring guide](../docs/WIRING_GUIDE.md) and [current pin diagram](../models/images/solar_to_reading.png) with a classic ESP32-WROOM-32 DevKit. With power off, match the **GPIO numbers** to the labels on the actual board.
 
 | Module | ESP32 connections | Bench notes |
 | --- | --- | --- |
@@ -40,17 +40,17 @@ Use the [step-by-step wiring guide](../docs/WIRING_GUIDE.md) with a classic ESP3
 | LTE modem UART2 | ESP32 RX 16 ← modem TXD. ESP32 TX 17 → modem RXD. | Use a documented 3.3 V logic carrier. Power modem from a separate regulated supply suitable for bursts, with common ground. |
 | DS18B20 | Data 4 | Three-wire mode. Use a 4.7 kΩ pull-up from data to 3.3 V. |
 | DFRobot SEN0161 pH interface | ADC1 34 | Power the board at 5 V. Use the pH divider in the wiring guide and measure its output before connecting the ESP32. |
-| DFRobot SEN0308 moisture sensor | ADC1 35 | Power the sensor at 3.3 V. Use the moisture divider in the wiring guide. Dry/wet calibration produces a reference index. |
+| DFRobot SEN0308 moisture sensor | ADC1 35 | Power at 3.3 V. Connect yellow directly after the voltage check. Use the optional divider if needed. Calibrate with the final wiring. [Moisture wiring](../docs/SOLAR_TO_READING_GUIDE.md#dfrobot-sen0308-moisture-sensor) |
 | Provisional RS485 NPK | UART1 RX 26, TX 27 | Red 3.3 V TTL485-V2.0 MAX3485: adapter TXD to ESP32 RX, adapter RXD to ESP32 TX. Uses automatic direction (`npkDirection = -1`). Set `npkDirection = 25` for a manual-direction `DE` and `/RE` breakout wired to GPIO25. |
 
 The OLED and RTC share SDA and SCL. Verify that the I2C pull-ups go to 3.3 V and check the breakouts for installed pull-ups before adding any. For the referenced SPI microSD breakout, `SO` connects to MISO and `SI` to MOSI. [Adafruit DS3231 breakout](https://learn.adafruit.com/adafruit-ds3231-precision-rtc-breakout/pinouts), [Adafruit microSD pinout](https://learn.adafruit.com/adafruit-microsd-spi-sdio/pinouts)
 
-Measure the pH and moisture voltages at their respective ADC junctions. Set the calibration points with the same resistors installed. Check the [optional modem and NPK power connections](../docs/WIRING_GUIDE.md#4-add-the-optional-modules-after-the-reader-can-save-a-scan) before adding those modules.
+Measure the pH and moisture voltages at their respective ADC inputs. Set the calibration points with the final wiring in place. Check the [optional modem and NPK power connections](../docs/WIRING_GUIDE.md#4-add-the-optional-modules-after-the-reader-can-save-a-scan) before adding those modules.
 
 ## Configure and operate
 
 1. Wire and verify sensors individually. Enable the installed inputs in `include/sensor_settings.h`. Enter measured pH calibration points and moisture endpoints. All sensor inputs are disabled in the stock build so an unconnected board reports unavailable readings.
-2. If using NPK, confirm the manufacturer documents three consecutive unsigned N, P and K registers in that order, an 8N1 Modbus RTU serial setting, and read function 03 or 04. Configure the address, baud and zero-based register. The firmware displays and saves raw register values. Changes to method, scaling, or reported units belong in the calibration and validation work.
+2. The selected probe's preset is **4800 baud, 8N1, address `0x01`, function `0x03`, first register `0x0003`** from the seller's reference. Set `npkEnabled` only when ready for a bench read and verify the settings if the unit has been reconfigured. The registers can return stored or conductivity-based values. The firmware displays and saves the raw values. Validate their meaning before using them as soil nutrient measurements. [Seller's reference manual](https://docs.google.com/document/d/1NHSvvIz9n-pFXRNgBlQDSRO91LF0v0aD/edit)
 3. Power on with a FAT32 card present. Set the DS3231 using the serial command `rtc-set YYYY-MM-DDTHH:MM:SSZ` with the actual UTC time. Philippine time is UTC+8. An unset or failed clock produces a blank timestamp and `unknown` quality.
 4. Let the probes stabilize under the approved procedure. Press **Scan** to capture once. Press **View** to switch between measurements and raw NPK. The OLED shows the latest attempt from the current session. Use **Scan** for a new attempt after a storage error.
 5. To enable SMS, create `firmware/include/secrets.h` from `firmware/include/secrets.example.h` if it is missing. Set `SOIL_SMS_RECIPIENT` to a consenting recipient's international number. Use a provisioned SMS-capable SIM in the powered modem. The OLED reports modem submission status. Verify phone receipt separately.
